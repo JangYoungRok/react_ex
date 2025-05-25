@@ -1,6 +1,7 @@
 // import React from "react";
-import { useState } from "react";
-import './App.css';
+import {useState} from "react";
+import "./App.css";
+import Alert from "./components/Alert.js"
 import ExpenseForm from "./components/ExpenseForm";
 import ExpenseList from "./components/ExpenseList";
 
@@ -37,18 +38,18 @@ import ExpenseList from "./components/ExpenseList";
 //                 <main className="main-container">
 //                     <h1>예산 계산기</h1>
 //
-//                     <div style={{width: '100%', backgroundColor: 'white', padding: '1rem'}}>
+//                     <div style={{width: "100%", backgroundColor: "white", padding: "1rem"}}>
 //                         <ExpenseForm />
 //                     </div>
 //
-//                     <div style={{width:'100%', backgroundColor: 'white', padding: '1rem'}}>
+//                     <div style={{width:"100%", backgroundColor: "white", padding: "1rem"}}>
 //                         {/* Props 사용 */}
 //                         <ExpenseList initialExpenses={this.state.expenses}
 //                                      handleDelete={this.handleDelete}/>
 //                     </div>
 //
-//                     <div style={{display: 'flex', justifyContent: 'end', marginTop: '1rem'}}>
-//                         <p style={{ fontSize: '2rem'}}>
+//                     <div style={{display: "flex", justifyContent: "end", marginTop: "1rem"}}>
+//                         <p style={{ fontSize: "2rem"}}>
 //                             총지출:
 //                             <span>원</span>
 //                         </p>
@@ -60,67 +61,82 @@ import ExpenseList from "./components/ExpenseList";
 
 const App = () => {
 
-    const [charge, setCharge] = useState("");
-    const [amount, setAmount] = useState(0);
+  const [charge, setCharge] = useState("");
+  const [amount, setAmount] = useState(0);
+  const [alert, setAlert] = useState({show: false});
 
-    const handleCharge = (e) => {
-        setCharge(e.target.value)
+  const handleCharge = (e) => {
+    setCharge(e.target.value)
+  }
+
+  const handleAmount = (e) => {
+    setAmount(e.target.valueAsNumber)
+  }
+
+  const handleAlert = ({type, text}) => {
+    setAlert({show: true, type, text})
+    setTimeout(() => {
+      setAlert({show: false});
+    }, 7000)
+  }
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (charge !== "" && amount > 0) {
+      const newExpense = {id: crypto.randomUUID(), charge, amount};
+      const newExpenses = [...expenses, newExpense];
+      setExpenses(newExpenses);
+      setCharge("");
+      setAmount(0);
+      handleAlert({ type: "success", text: "아이텡미 생성 되었습니다." });
+    } else {
+      handleAlert( {type: "danger", text: "charge는 빈 값일 수 없으며 amount는 0보다 큰 숫자를 입력해 주세요."})
     }
+  }
 
-    const handleAmount = (e) => {
-        setAmount(e.target.valueAsNumber)
-    }
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        if (charge !== "" && amount > 0) {
-            const newExpense = {id: crypto.randomUUID(), charge, amount};
-            const newExpenses = [...expenses, newExpense];
-            setExpenses(newExpenses);
-            setCharge("");
-            setAmount(0);
-        }
-    }
 
-    const [expenses, setExpenses] = useState([
-        {id: 1, charge: "렌트비", amount: 1600},
-        {id: 2, charge: "교통비", amount: 400},
-        {id: 3, charge: "식비", amount: 1200}
-    ])
+  const [expenses, setExpenses] = useState([
+    {id: 1, charge: "렌트비", amount: 1600},
+    {id: 2, charge: "교통비", amount: 400},
+    {id: 3, charge: "식비", amount: 1200}
+  ])
 
-    const handleDelete = (id) => {
-        const newExpenses = expenses.filter(expense => expense.id !== id)
-        setExpenses(newExpenses)
-    }
+  const handleDelete = (id) => {
+    const newExpenses = expenses.filter(expense => expense.id !== id)
+    setExpenses(newExpenses)
+    handleAlert( {type: "danger", text: "아이템이 삭제 되었습니다."})
+  }
 
-    return (
-            <main className="main-container">
-                <h1>예산 계산기</h1>
+  return (
+    <main className="main-container">
+      {alert.show ? <Alert type={alert.type} text={alert.text}/> : null}
+      <h1>예산 계산기</h1>
 
-                <div style={{width: '100%', backgroundColor: 'white', padding: '1rem'}}>
-                    <ExpenseForm
-                            handleCharge={handleCharge}
-                            charge={charge}
-                            handleAmount={handleAmount}
-                            amount={amount}
-                            handleSubmit={handleSubmit}
-                    />
-                </div>
+      <div style={{width: "100%", backgroundColor: "white", padding: "1rem"}}>
+        <ExpenseForm
+          handleCharge={handleCharge}
+          charge={charge}
+          handleAmount={handleAmount}
+          amount={amount}
+          handleSubmit={handleSubmit}
+        />
+      </div>
 
-                <div style={{width:'100%', backgroundColor: 'white', padding: '1rem'}}>
-                    {/* Props 사용 */}
-                    <ExpenseList initialExpenses={expenses}
-                                 handleDelete={handleDelete}/>
-                </div>
+      <div style={{width: "100%", backgroundColor: "white", padding: "1rem"}}>
+        {/* Props 사용 */}
+        <ExpenseList initialExpenses={expenses}
+                     handleDelete={handleDelete}/>
+      </div>
 
-                <div style={{display: 'flex', justifyContent: 'end', marginTop: '1rem'}}>
-                    <p style={{ fontSize: '2rem'}}>
-                        총지출:
-                        <span>원</span>
-                    </p>
-                </div>
-            </main>
-    )
+      <div style={{display: "flex", justifyContent: "end", marginTop: "1rem"}}>
+        <p style={{fontSize: "2rem"}}>
+          총지출:
+          <span>원</span>
+        </p>
+      </div>
+    </main>
+  )
 }
 
 export default App;

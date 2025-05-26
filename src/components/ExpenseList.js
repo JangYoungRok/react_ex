@@ -29,7 +29,7 @@ import {MdDelete} from "react-icons/md";
 //     }
 // }
 
-const ExpenseList = ({ handleDelete, initialExpenses }) => {
+const ExpenseList = ({ handleDelete, initialExpenses, handleEdit, handleClear }) => {
     return (
             <>
                 <ul className='list'>
@@ -37,11 +37,13 @@ const ExpenseList = ({ handleDelete, initialExpenses }) => {
                     {initialExpenses.map(expense =>{
                         return (
                                 <ExpenseItem expense={expense} key={expense.id}
-                                             handleDelete={handleDelete}/>
+                                             handleDelete={handleDelete}
+                                             handleEdit={handleEdit}
+                                />
                         )
                     })}
                 </ul>
-                <button className='btn'>
+                <button className='btn' onClick={handleClear}>
                     목록 지우기
                     <MdDelete className='btn-icon'/>
                 </button>
